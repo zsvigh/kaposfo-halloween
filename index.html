@@ -151,10 +151,10 @@ $('b-names').onclick=function(){
 
 // ---- térkép
 var map,gpsOn=false,watchId=null,meMarker=null,accCircle=null;
-function icon(n){return L.divIcon({className:'pk',iconSize:[40,40],iconAnchor:[20,36],html:
+function icon(n,last){var a=last?'#9b4dff':'#ff8a00',b=last?'#6a2fc0':'#e07800';return L.divIcon({className:'pk',iconSize:[40,40],iconAnchor:[20,36],html:
 '<svg width="40" height="40" viewBox="0 0 38 38"><path d="M19 8c0-3 1-5 4-6" stroke="#2b1b3d" stroke-width="4" fill="none"/><path d="M19 8c0-3 1-5 4-6" stroke="#3aa51e" stroke-width="2" fill="none"/>'+
-'<g stroke="#2b1b3d" stroke-width="2"><ellipse cx="11" cy="22" rx="9" ry="12" fill="#e07800"/><ellipse cx="27" cy="22" rx="9" ry="12" fill="#e07800"/><ellipse cx="19" cy="22" rx="9" ry="13" fill="#ff8a00"/></g>'+
-'<text x="19" y="28" text-anchor="middle" font-size="15" font-weight="800" fill="#2b1b3d" font-family="Fredoka,system-ui">'+n+'</text></svg>'});}
+'<g stroke="#2b1b3d" stroke-width="2"><ellipse cx="11" cy="22" rx="9" ry="12" fill="'+b+'"/><ellipse cx="27" cy="22" rx="9" ry="12" fill="'+b+'"/><ellipse cx="19" cy="22" rx="9" ry="13" fill="'+a+'"/></g>'+
+'<text x="19" y="28" text-anchor="middle" font-size="15" font-weight="800" fill="#2b1b3d" font-family="Fredoka,system-ui" fill-opacity="1" style="fill:'+(last?'#fff':'#2b1b3d')+'">'+n+'</text></svg>'});}
 
 function startMap(kids){
   show('app');
@@ -175,14 +175,16 @@ function buildMap(st){
     var row=Object.assign({user_id:user.id,place_idx:i},fields);
     sb.from('visits').upsert(row,{onConflict:'user_id,place_idx'}).then(function(r){if(r.error)alert('Mentési hiba: '+r.error.message);});
   }
-  P.forEach(function(p,i){
-    var n=i+1,s=st[i]||{},drag=p[3]!=="ok";
+  // megjelenítési sorrend: Kossuth 133. (0. elem) az utolsó; az adatbázis-azonosító (index) nem változik
+  var ORDER=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0];
+  ORDER.forEach(function(i,pos){
+    var p=P[i],n=pos+1,last=pos===ORDER.length-1,s=st[i]||{},drag=p[3]!=="ok";
     var ll=s.lat!=null?[s.lat,s.lon]:(p[1]==null?CENTER:[p[1],p[2]]);
-    var m=L.marker(ll,{icon:icon(n),draggable:drag,title:p[0]});
+    var m=L.marker(ll,{icon:icon(n,last),draggable:drag,title:p[0]});
     var li=document.createElement('li');if(drag)li.className='warn';
     var note=s.lat!=null?'kézzel igazítva':p[3]==="ok"?(p[4]||"pontos találat"):p[3]==="street"?"csak utca-szintű – húzd a házra! "+(p[4]||""):"nincs találat – húzd a helyére!";
     li.innerHTML='<div class="n"></div><div class="t"><b></b><span></span></div><input type="checkbox" class="ck" title="Jártunk itt">';
-    li.querySelector('.n').textContent=n;li.querySelector('b').textContent=p[0];
+    li.querySelector('.n').textContent=n;if(last){var nb=li.querySelector('.n');nb.style.background='#9b4dff';nb.style.color='#fff';}li.querySelector('b').textContent=p[0];
     var info=li.querySelector('span');info.textContent=note;
     m.bindPopup('<b>'+n+'. '+p[0]+'</b>');
     m.on('dragend',function(){var c=m.getLatLng();info.textContent='kézzel igazítva';save(i,{lat:c.lat,lon:c.lng});});
