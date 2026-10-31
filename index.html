@@ -91,17 +91,17 @@ var P=[
 ["Kossuth Lajos utca 187/a.",46.360222,17.658936,"ok","OSM-ben 187 (a „/a” nélkül)"],
 ["Kossuth Lajos utca 228.",46.359997,17.659415,"ok"],
 ["Kultúrház",46.360514,17.662031,"ok"],
-["Központ",null,null,"none"],
-["Dózsa György utca 4.",46.359827,17.662578,"street"],
-["Dózsa György utca 14.",46.359827,17.662578,"street"],
-["Dózsa György utca 42.",46.359827,17.662578,"street"],
-["Zrínyi utca 13.",46.362935,17.658636,"street","OSM: Zrínyi Miklós utca"],
-["Zrínyi utca 20.",46.362935,17.658636,"street","OSM: Zrínyi Miklós utca"],
-["Zrínyi utca 42.",46.362935,17.658636,"street","OSM: Zrínyi Miklós utca"],
-["Csokonai játszótér",null,null,"none"],
-["Csokonai utca 23.",46.361600,17.656563,"street"],
+["Központ",46.360619,17.662379,"ok"],
+["Dózsa György utca 4.",46.363585,17.661209,"ok"],
+["Dózsa György utca 14.",46.362446,17.661790,"ok"],
+["Dózsa György utca 42.",46.358821,17.663162,"ok"],
+["Zrínyi utca 13.",46.362956,17.658140,"ok"],
+["Zrínyi utca 20.",46.362803,17.659020,"ok"],
+["Zrínyi utca 42.",46.362831,17.657781,"ok"],
+["Csokonai játszótér",46.362249,17.656438,"ok"],
+["Csokonai utca 23.",46.361135,17.656492,"ok"],
 ["Búzavirág utca 19.",46.358455,17.667134,"street"],
-["Búzavirág utca 22.",46.358455,17.667134,"street"]
+["Búzavirág utca 22.",46.358364,17.667410,"ok"]
 ];
 
 // ---- belépés
@@ -179,10 +179,10 @@ function buildMap(st){
   var ORDER=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0];
   ORDER.forEach(function(i,pos){
     var p=P[i],n=pos+1,last=pos===ORDER.length-1,s=st[i]||{},drag=p[3]!=="ok";
-    var ll=s.lat!=null?[s.lat,s.lon]:(p[1]==null?CENTER:[p[1],p[2]]);
+    var ll=(drag&&s.lat!=null)?[s.lat,s.lon]:(p[1]==null?CENTER:[p[1],p[2]]);
     var m=L.marker(ll,{icon:icon(n,last),draggable:drag,title:p[0]});
     var li=document.createElement('li');if(drag)li.className='warn';
-    var note=s.lat!=null?'kézzel igazítva':p[3]==="ok"?(p[4]||"pontos találat"):p[3]==="street"?"csak utca-szintű – húzd a házra! "+(p[4]||""):"nincs találat – húzd a helyére!";
+    var note=(drag&&s.lat!=null)?'kézzel igazítva':p[3]==="ok"?(p[4]||"pontos találat"):p[3]==="street"?"csak utca-szintű – húzd a házra! "+(p[4]||""):"nincs találat – húzd a helyére!";
     li.innerHTML='<div class="n"></div><div class="t"><b></b><span></span></div><input type="checkbox" class="ck" title="Jártunk itt">';
     li.querySelector('.n').textContent=n;if(last){var nb=li.querySelector('.n');nb.style.background='#9b4dff';nb.style.color='#fff';}li.querySelector('b').textContent=p[0];
     var info=li.querySelector('span');info.textContent=note;
